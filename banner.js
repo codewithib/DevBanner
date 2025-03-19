@@ -264,10 +264,6 @@ const changeDisplayAndCaret = () => {
     const isDiplayNone = stackSelect.style.display === "none";
     stackSelect.style.display = isDiplayNone ? "block" : "none";
 
-    // if(dropdownBtn.innerHTML === `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024"><path fill="currentColor" d="M8.2 751.4c0 8.6 3.4 17.401 10 24.001c13.2 13.2 34.8 13.2 48 0l451.8-451.8l445.2 445.2c13.2 13.2 34.8 13.2 48 0s13.2-34.8 0-48L542 251.401c-13.2-13.2-34.8-13.2-48 0l-475.8 475.8c-6.8 6.8-10 15.4-10 24.2z"/></svg>`) {
-    //     dropdownBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024"><path fill="currentColor" d="M831.872 340.864L512 652.672L192.128 340.864a30.59 30.59 0 0 0-42.752 0a29.12 29.12 0 0 0 0 41.6L489.664 714.24a32 32 0 0 0 44.672 0l340.288-331.712a29.12 29.12 0 0 0 0-41.728a30.59 30.59 0 0 0-42.752 0z"/></svg>`;
-    // }
-
     if (dropdownBtn.classList.contains("dropdownBtn")) {
         dropdownBtn.classList.remove("dropdownBtn");
         dropdownBtn.classList.add("caretDown");
@@ -469,7 +465,60 @@ const loadBannerFormData = () => {
         githubInput.value = savedFormData.userGitHub;
     
     }
+}
 
+const saveSelectedStack = () => {
+    localStorage.setItem("selectedStack", JSON.stringify(selectedStack));
+}
+
+const loadSelectedStack = () => {
+    const selectedStackStorage = JSON.parse(localStorage.getItem("selectedStack") || "[]");
+    if (selectedStackStorage) {
+        stacksWrapperBanner.innerHTML = `<p class = "stackTxt">Stack:</p>`;
+    
+        for (let stack of selectedStackStorage) {
+            const div = document.createElement("div");
+            div.classList.add("stackIconBanner")
+            div.innerHTML = stack.icon;
+            stacksWrapperBanner.appendChild(div);
+        }
+
+        stackPreview.innerHTML = "";
+
+        for (let stack of selectedStackStorage) {
+            const div = document.createElement("div");
+            div.classList.add("stackAndIconWrapper");
+    
+            const stackIcon = document.createElement("span");
+            stackIcon.classList.add("stackIcon");
+            stackIcon.innerHTML = stack.icon;
+    
+            const stackName = document.createElement("p");
+            stackName.classList.add("stackName");
+            stackName.textContent = stack.name;
+    
+            const delBtn = document.createElement("button");
+            delBtn.classList.add("delBtn");
+            delBtn.textContent = "x";
+            delBtn.setAttribute("data-stack", `${stack.name}`);
+    
+            div.appendChild(stackIcon);
+            div.appendChild(stackName);
+            div.appendChild(delBtn);
+            stackPreview.appendChild(div);
+        }
+    
+        const delBtns = document.querySelectorAll(".delBtn");
+        for (let delBtn of delBtns ) {
+            delBtn.addEventListener("click", () => {
+                const stackToRemove = delBtn.getAttribute('data-stack');
+                console.log(stackToRemove);
+                removeStack(stackToRemove);
+                console.log(selectedStack)
+            });
+        }
+    
+    }
 }
 // Local Storage logic ends here
 
@@ -485,6 +534,7 @@ document.addEventListener("DOMContentLoaded", () => {
     displayField();
     displayTwitter();
     displayGitHub();
+    loadSelectedStack();
     
 });
 
@@ -508,6 +558,7 @@ stackSelect.addEventListener("change", (e) => {
     e.preventDefault();
     validateStack();
     displayStackBanner();
+    saveSelectedStack();
 });
 
 
